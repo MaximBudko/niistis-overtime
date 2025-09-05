@@ -1,4 +1,10 @@
-<%= form_with url: do_generate_ov_path(format: :xlsx), method: :post, local: true do |f| %>
+<%= form_with url: do_generate_ov_path(format: :xlsx),
+              method: :post,
+              local: true,
+              html: { id: 'ov-form' } do |f| %>
+
+  <!-- cache-buster -->
+  <%= hidden_field_tag :request_id, "", id: "ov-request-id" %>
   <fieldset>
     <legend><strong>Диапазон дат:</strong></legend>
     <div style="display: flex; gap: 20px;">
@@ -144,9 +150,50 @@
         });
       });
     }
+    
 
     startInput.addEventListener('change', fetchUsers);
     endInput.addEventListener('change', fetchUsers);
+
+    let reportType = null;
+    document.querySelectorAll("#ov-form button[type=submit]").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        reportType = e.target.value; // "excel" или "dokladnaya"
+      });
+    });
+
+    // --- сабмит через fetch ---
+    const ovForm = document.getElementById('ov-form');
+    if (ovForm) {
+      ovForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const uniq = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
+        const action = ovForm.action.split('?')[0] + '?request_id=' + uniq;
+
+        const formData = new FormData(ovForm);
+        if (reportType) formData.set("report_type", reportType);
+
+        fetch(action, { method: 'POST', body: formData })
+          .then(resp => resp.blob())
+          .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+
+            if (reportType === "dokladnaya") {
+              a.download = "Докладная.xlsx";
+            } else {
+              a.download = "Отчет.xlsx";
+            }
+
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+          });
+      });
+    }
   });
 <% end %>
 
@@ -269,6 +316,7 @@
     const submitBtn = document.getElementById("submit-btn");
     const tableBody = document.querySelector("#user-table tbody");
 
+
     <%
       users_json = @users.map do |u|
         surname  = u.custom_field_value(@cf_surname).to_s
@@ -288,6 +336,9 @@
 
 
     const projects = <%= raw @projects.map { |p| { id: p.id, name: p.name } }.to_json %>;
+    const ovForm = document.getElementById('ov-form');
+
+
 
     openBtn.addEventListener("click", () => {
       overlay.style.display = "block";

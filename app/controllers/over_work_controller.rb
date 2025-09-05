@@ -108,7 +108,7 @@ class OverWorkController < ApplicationController
 
     @overtime_issues = entries.map(&:issue).compact.uniq
     @users = User.where(id: user_ids)
-
+      Rails.logger.info ">>> request_id: #{params[:request_id]}"
     if @overtime_issues.blank?
       flash[:error] = "У выбранных пользователей нет задач с типом работ 'Сверхурочная' за выбранный период."
       redirect_to action: :generate_overtime_report and return
