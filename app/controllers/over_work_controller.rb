@@ -135,10 +135,13 @@ class OverWorkController < ApplicationController
   def query_constructor
     @report_data = JSON.parse(params[:report_data])
     @type_overwork_modal = params[:option_select_modal]
+    @note_text = params[:my_field]
+
     
     # Вывод в лог для проверки
     Rails.logger.info("Полученные данные:")
     Rails.logger.info(@report_data.inspect)
+    puts "Тут должна быть запись - #{@note_text}"
 
     # Тут логика по обработке массива
     respond_to do |format|

@@ -29,6 +29,21 @@
     <legend><strong>Сотрудники с "Сверхурочной" работой:</strong></legend>
     <div id="user_cards_container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;"></div>
   </fieldset>
+    
+
+  <fieldset style="margin-top: 20px;">
+    <legend><strong>Текст докладной</strong></legend>
+
+    <div id="user_cards_container"
+        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
+
+    <%= f.text_field :my_field,
+          id: "report_text",
+          value: "В связи с производственной необходимостью и ввиду большого объема текущих работ,",
+          style: "width: 100%; display: block; grid-column: 1 / -1; box-sizing: border-box;" %>
+
+    </div>
+  </fieldset>
 
   <br>
   <div style="margin-top: 20px; margin-right: 20px;">
@@ -39,6 +54,7 @@
         📄 Сформировать Докладную
     <% end %>
   </div>
+
 <% end %>
 
 <!-- Модальное окно и форма -->
@@ -59,7 +75,9 @@
   <div class="modal-buttons">
     <%= button_tag "Добавить пользователя", type: "button", id: "add-row-btn", class: "button" %>
     <%= button_tag "Удалить", type: "button", id: "remove-row-btn", class: "button" %>
-    <%= select_tag :option_select_modal, options_for_select([['В выходные', 'option_1'], ['В будни', 'option_2']]), include_blank: '--- Выберите ---' %>
+    <%= l.hidden_field :my_field, id: "hidden_my_field" %>
+    <%= date_field_tag :date_of_formation, nil, id: "date_of_formation_picker"%>
+    <%= select_tag :option_select_modal, options_for_select([['В выходные', 'option_1'], ['В будни', 'option_2']]), include_blank: '--- Тип работ ---' %>
   </div>
 
   <table id="user-table" class="list">
@@ -69,7 +87,7 @@
         <th>Пользователь</th>
         <th>Отдел</th>
         <th>Должность</th>
-        <th>Дата</th>
+        <th>Дата (день работы)</th>
         <th>Проект</th>
       </tr>
     </thead>
@@ -96,7 +114,15 @@
   document.addEventListener('DOMContentLoaded', () => {
     const startInput = document.getElementById('start_date_picker');
     const endInput = document.getElementById('end_date_picker');
+    const dateOfFormationInput = document.getElementById('date_of_formation_picker')
     const userContainer = document.getElementById('user_cards_container');
+
+    let el = document.getElementById("report_text");
+    el.value = localStorage.getItem("report_text") || el.value;
+    el.addEventListener("input", function() {
+        localStorage.setItem("report_text", el.value);
+    });
+
 
     function fetchUsers() {
       const startDate = startInput.value;
@@ -315,7 +341,6 @@
     const removeRowBtn = document.getElementById("remove-row-btn");
     const submitBtn = document.getElementById("submit-btn");
     const tableBody = document.querySelector("#user-table tbody");
-
 
     <%
       users_json = @users.map do |u|

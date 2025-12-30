@@ -57,7 +57,7 @@ wb.add_worksheet(name: "Dokladnaya") do |sheet|
     rt_right.add_run("\n", alignment: {horizontal: :right, vertical: :center, wrap_text: :true}, sz: 12, font_name: 'Times New Roman')
     rt_right.add_run('ООО НИИСТИС', alignment: {horizontal: :right, vertical: :center, wrap_text: :true}, sz: 12, font_name: 'Times New Roman')
     rt_right.add_run("\n", alignment: {horizontal: :right, vertical: :center, wrap_text: :true}, sz: 12, font_name: 'Times New Roman')
-    rt_right.add_run('Ф.В. Петрову', alignment: {horizontal: :right, vertical: :center, wrap_text: :true}, sz: 12, font_name: 'Times New Roman')
+    rt_right.add_run('А.В. Минееву', alignment: {horizontal: :right, vertical: :center, wrap_text: :true}, sz: 12, font_name: 'Times New Roman')
 
     sheet.add_row [rt_left_with_date, "" , rt_right, ""], height: 65, style: wrap_importer
     sheet.merge_cells("C3:D3")
@@ -72,28 +72,27 @@ wb.add_worksheet(name: "Dokladnaya") do |sheet|
     sheet.add_row ["Докладная записка", "", "", ""], style: title_main_text
     sheet.add_row ["", "", "", ""]
     sheet.merge_cells("A11:D11")
+#-------------------------------------Основная часть документа ---------------------------------------
 
     tp_wrk = ""
-
-    if @type_overwork_modal.to_s == "option_1"
-        tp_wrk = "о проделанной работе сотрудников за выходные дни"
+    if @type_overwork_modal == "option_1"
+        tp_wrk = "работе в выходные дни"
     else
-        tp_wrk = "о проделанной сверхурочной работе сотрудников"
+        tp_wrk = "сверхурочным работам"
     end
 
-    p tp_wrk
-    p @report_data
+    sheet.add_row [
+        "   #{@note_text} прошу привлечь к #{tp_wrk} следующих работников:",
+        "",
+        "",
+        ""
+    ], height: 30, style: main_text_in_body
 
-    sheet.add_row ["","","",""]
+    @report_data.each do |p|
+        puts p
+        puts "-----------------Следующий элемент массива---------------------"
 
-    sheet.print_options do |print_opts|
-        print_opts.horizontal_centered = true
-        print_opts.vertical_centered = true
     end
-    sheet.page_margins do |margins|
-      margins.top = 0.25     # верхний отступ: 0.25 дюйма
-      margins.bottom = 0.25  # нижний отступ: 0.25 дюйма
-    end
 
-    sheet.column_widths 4, 47, 30, 8
+
 end

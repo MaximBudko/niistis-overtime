@@ -2,7 +2,7 @@ Redmine::Plugin.register :overtime_work do
   name 'Overtime Work plugin'
   author 'Maxim Budko'
   description 'Отчет о сверхурочной работе'
-  version '0.2.5'
+  version '0.2.6-b'
 
   # Разрешение
   project_module :overtime_work do
